@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e0a4dee346ad2ebec6349d933081e60db0517a6593e07ebd1fb747bae99d0156"
+            "sha256": "b73a2fbbafb66e22e3fed7da7e98b6f3c8089b64090d93aabc362b26df9ff593"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -167,11 +167,11 @@
         },
         "jinja2": {
             "hashes": [
-                "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852",
-                "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"
+                "sha256:077ce6014f7b40d03b47d1f1ca4b0fc8328a692bd284016f806ed0eaca390ad8",
+                "sha256:611bb273cd68f3b993fabdc4064fc858c5b47a973cb5aa7999ec1ba405c87cd7"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==3.1.2"
+            "index": "pypi",
+            "version": "==3.0.3"
         },
         "mako": {
             "hashes": [
@@ -253,6 +253,14 @@
             "index": "pypi",
             "version": "==2.6.0"
         },
+        "python-decouple": {
+            "hashes": [
+                "sha256:2838cdf77a5cf127d7e8b339ce14c25bceb3af3e674e039d4901ba16359968c7",
+                "sha256:6cf502dc963a5c642ea5ead069847df3d916a6420cad5599185de6bab11d8c2e"
+            ],
+            "index": "pypi",
+            "version": "==3.6"
+        },
         "pytz": {
             "hashes": [
                 "sha256:1e760e2fe6a8163bc0b3d9a19c4f84342afa0a2affebfaa84b01b978a02ecaa7",
@@ -312,11 +320,11 @@
         },
         "werkzeug": {
             "hashes": [
-                "sha256:1ce08e8093ed67d638d63879fd1ba3735817f7a80de3674d293f5984f25fb6e6",
-                "sha256:72a4b735692dd3135217911cbeaa1be5fa3f62bffb8745c5215420a03dc55255"
+                "sha256:3389bbfe6d40c6dd25e6d3f974155163c8b3de5bbda6a89342d4ab93fae80ba0",
+                "sha256:64c02f6495ba01eddd6625b3675f357cd358a73f1e38458a56ad86c5baa30b53"
             ],
-            "markers": "python_version >= '3.7'",
-            "version": "==2.1.2"
+            "index": "pypi",
+            "version": "==2.0.0"
         },
         "wtforms": {
             "hashes": [

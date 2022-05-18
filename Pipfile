@@ -11,6 +11,9 @@ Flask-Moment = "==0.11.0"
 Flask-SQLAlchemy = "==2.4.4"
 flask-migrate = "*"
 psycopg2 = "*"
+werkzeug = "==2.0.0"
+jinja2 = "==3.0.3"
+python-decouple = "*"
 
 [dev-packages]
 
