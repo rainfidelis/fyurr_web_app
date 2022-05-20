@@ -2,6 +2,7 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+from email.policy import default
 import json
 import dateutil.parser
 import babel
@@ -28,11 +29,11 @@ Migrate(app, db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 
 shows = db.Table('shows',
                  db.Column('artists_id', db.Integer, db.ForeignKey('artists.id'), primary_key=True),
-                 db.Column('venues_id', db.Integer, db.ForeignKey('venues.id'), primary_key=True)
+                 db.Column('venues_id', db.Integer, db.ForeignKey('venues.id'), primary_key=True),
+                 db.Column('start_time', db.DateTime, nullable=False)
                  )
 
 
@@ -48,13 +49,16 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(100))
+    genres = db.Column(db.JSON, nullable=False)
+    # genres = db.Column(db.String(120), nullable=False)
+    seeking_talent = db.Column(db.Boolean, default=False)
+    seeking_description = db.Column(db.String())
     artists = db.relationship('Artist', secondary=shows,
                               backref=db.backref('venues', lazy=True))
 
     def __repr__(self) -> str:
         return f'<Venue {self.id}, {self.name}>'
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
     __tablename__ = 'artists'
@@ -64,7 +68,10 @@ class Artist(db.Model):
     city = db.Column(db.String(120), nullable=False)
     state = db.Column(db.String(120), nullable=False)
     phone = db.Column(db.String(120), nullable=False)
-    genres = db.Column(db.String(120))
+    # genres = db.Column(db.String(120), nullable=False)
+    genres = db.Column(db.JSON, nullable=False)
+    seeking_venue = db.Column(db.Boolean, default=False)
+    seeking_description = db.Column(db.String())
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     website_link = db.Column(db.String(100))
@@ -72,7 +79,6 @@ class Artist(db.Model):
     def __repr__(self) -> str:
         return f'<Artist {self.id}, {self.name}>'
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -444,7 +450,7 @@ def create_artist_submission():
 #  ----------------------------------------------------------------
 
 @app.route('/shows')
-def shows():
+def display_shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
   data=[{
