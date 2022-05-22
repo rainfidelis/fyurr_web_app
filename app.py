@@ -13,7 +13,9 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+from models import *
 from flask_migrate import Migrate
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -21,64 +23,9 @@ from flask_migrate import Migrate
 app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
-db = SQLAlchemy(app)
-
-# TODO: connect to a local postgresql database
+db.app = app
+db.init_app(app)
 Migrate(app, db)
-
-#----------------------------------------------------------------------------#
-# Models.
-#----------------------------------------------------------------------------#
-
-shows = db.Table('shows',
-                 db.Column('artists_id', db.Integer, db.ForeignKey('artists.id'), primary_key=True),
-                 db.Column('venues_id', db.Integer, db.ForeignKey('venues.id'), primary_key=True),
-                 db.Column('start_time', db.DateTime, nullable=False)
-                 )
-
-
-class Venue(db.Model):
-    __tablename__ = 'venues'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    city = db.Column(db.String(120), nullable=False)
-    state = db.Column(db.String(120), nullable=False)
-    address = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(120), nullable=False)
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website_link = db.Column(db.String(100))
-    genres = db.Column(db.JSON, nullable=False)
-    # genres = db.Column(db.String(120), nullable=False)
-    seeking_talent = db.Column(db.Boolean, default=False)
-    seeking_description = db.Column(db.String())
-    artists = db.relationship('Artist', secondary=shows,
-                              backref=db.backref('venues', lazy=True))
-
-    def __repr__(self) -> str:
-        return f'<Venue {self.id}, {self.name}>'
-
-
-class Artist(db.Model):
-    __tablename__ = 'artists'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
-    city = db.Column(db.String(120), nullable=False)
-    state = db.Column(db.String(120), nullable=False)
-    phone = db.Column(db.String(120), nullable=False)
-    # genres = db.Column(db.String(120), nullable=False)
-    genres = db.Column(db.JSON, nullable=False)
-    seeking_venue = db.Column(db.Boolean, default=False)
-    seeking_description = db.Column(db.String())
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
-    website_link = db.Column(db.String(100))
-
-    def __repr__(self) -> str:
-        return f'<Artist {self.id}, {self.name}>'
-
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -110,6 +57,8 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+  
+  
   data=[{
     "city": "San Francisco",
     "state": "CA",
@@ -450,7 +399,7 @@ def create_artist_submission():
 #  ----------------------------------------------------------------
 
 @app.route('/shows')
-def display_shows():
+def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
   data=[{
