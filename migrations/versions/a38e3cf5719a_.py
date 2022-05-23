@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: cc73745e163e
+Revision ID: a38e3cf5719a
 Revises: 
-Create Date: 2022-05-22 15:29:21.946647
+Create Date: 2022-05-23 08:59:42.868650
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'cc73745e163e'
+revision = 'a38e3cf5719a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -48,13 +48,13 @@ def upgrade():
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('shows',
-    sa.Column('show_id', sa.Integer(), nullable=False),
-    sa.Column('artists_id', sa.Integer(), nullable=False),
-    sa.Column('venues_id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('artist_id', sa.Integer(), nullable=False),
+    sa.Column('venue_id', sa.Integer(), nullable=False),
     sa.Column('start_time', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['artists_id'], ['artists.id'], onupdate='CASCADE', ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['venues_id'], ['venues.id'], onupdate='CASCADE', ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('show_id', 'artists_id', 'venues_id')
+    sa.ForeignKeyConstraint(['artist_id'], ['artists.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['venue_id'], ['venues.id'], onupdate='CASCADE', ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
 
