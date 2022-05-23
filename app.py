@@ -2,7 +2,6 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-from email.policy import default
 import json
 import dateutil.parser
 from datetime import datetime
@@ -45,6 +44,7 @@ app.jinja_env.filters['datetime'] = format_datetime
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
+
 #  Home Page
 #  ----------------------------------------------------------------
 @app.route('/')
@@ -110,6 +110,7 @@ def search_venues():
         "count": len(data),
         "data": data
         }
+
     return render_template('pages/search_venues.html', results=response, search_term=search_term)
 
 
@@ -154,11 +155,9 @@ def show_venue(venue_id):
         "upcoming_shows_count": len(upcoming_shows),
     }
 
-    
     return render_template('pages/show_venue.html', venue=venue_data)
 
-#  Create Venue
-#  ----------------------------------------------------------------
+
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
     form = VenueForm()
@@ -167,24 +166,53 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+    if request.form.get('seeking_talent') == 'y':
+        seeking = True
+    else:
+        seeking = False
+    # Retrieve form values
+    name = request.form['name']
+    city = request.form['city']
+    state = request.form['state']
+    address = request.form['address']
+    phone = request.form['phone']
+    website = request.form['website_link']
+    image_link = request.form['image_link']
+    facebook_link = request.form['facebook_link']
+    genres = request.form['genres']
+    seeking_talent = seeking
+    seeking_description = request.form['seeking_description']
+    
+    # Insert new venue details. If successful, flash success
+    try:
+        new_venue = Venue(name=name, city=city, state=state, address=address, 
+          phone=phone, website=website, image_link=image_link, facebook_link=facebook_link,
+          genres=genres, seeking_talent=seeking_talent, seeking_description=seeking_description)
+        db.session.add(new_venue)
+        db.session.commit()
+        flash('Venue ' + request.form['name'] + ' was successfully listed!')
+    except:
+        db.session.rollback()
+        flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+    finally:
+        db.session.close()
 
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
+    return render_template('pages/home.html')
+
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-  # TODO: Complete this endpoint for taking a venue_id, and using
-  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+    # TODO: Complete this endpoint for taking a venue_id, and using
+    # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
+    try:
+        Venue.query.get(venue_id).delete()
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
 
-  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
-  # clicking that button delete it from the db then redirect the user to the homepage
-  return None
+    return redirect(url_for('index'))
 
 #  Artists
 #  ----------------------------------------------------------------
