@@ -201,6 +201,8 @@ def create_venue_submission():
           genres=genres, seeking_talent=seeking_talent, seeking_description=seeking_description)
         db.session.add(new_venue)
         db.session.commit()
+        
+        new_venue = Venue.query.filter_by(name=name).all()[0]
         flash('Venue ' + request.form['name'] + ' was successfully listed!')
     except:
         db.session.rollback()
@@ -208,16 +210,16 @@ def create_venue_submission():
     finally:
         db.session.close()
 
-    return render_template('pages/home.html')
+    return redirect(url_for('show_venue', venue_id=new_venue.id))
 
 
-@app.route('/venues/<venue_id>', methods=['DELETE'])
+@app.route('/venues/<venue_id>/delete', methods=['POST', 'GET', 'DELETE'])
 def delete_venue(venue_id):
     """
     Delete an existing venue and redirect the user to the home page
     """
     try:
-        Venue.query.get(venue_id).delete()
+        Venue.query.filter_by(id=venue_id).delete()
         db.session.commit()
     except:
         db.session.rollback()
@@ -325,9 +327,6 @@ def create_artist_form():
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
-    # called upon submitting the new artist listing form
-    # TODO: insert form data as a new Venue record in the db, instead
-    # TODO: modify data to be the data object returned from db insertion
     name = request.form['name']
     city = request.form['city']
     state = request.form['state']
@@ -339,18 +338,36 @@ def create_artist_submission():
     image_link = request.form['image_link']
     website = request.form['website_link']
 
-    artist = Artist(name=name, city=city, state=state, phone=phone, genres=genres,
-        seeking_venue=seeking_venue, seeking_description=seeking_description,
-        facebook_link=facebook_link, image_link=image_link, website=website)
-
-    db.session.add(artist)
-    db.session.commit()
-
-    # on successful db insert, flash success
-    flash('Artist ' + request.form['name'] + ' was successfully listed!')
-    # TODO: on unsuccessful db insert, flash an error instead.
-    # e.g., flash('An error occurred. Artist ' + data.name + ' could not be listed.')
+    try:
+        artist = Artist(name=name, city=city, state=state, phone=phone, genres=genres,
+            seeking_venue=seeking_venue, seeking_description=seeking_description,
+            facebook_link=facebook_link, image_link=image_link, website=website)
+        db.session.add(artist)
+        db.session.commit()
+        artist = Artist.query.filter_by(name=name).all()[0]
+        flash('Artist ' + request.form['name'] + ' was successfully listed!')
+    except:
+        db.session.rollback()
+        flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed.')
+    finally:
+        db.session.close()
     return redirect(url_for('show_artist', artist_id=artist.id))
+
+
+@app.route('/artists/<artist_id>/delete', methods=['POST', 'GET', 'DELETE'])
+def delete_artist(artist_id):
+    """
+    Delete an existing venue and redirect the user to the home page
+    """
+    try:
+        Artist.query.filter_by(id=artist_id).delete()
+        db.session.commit()
+    except:
+        db.session.rollback()
+    finally:
+        db.session.close()
+
+    return redirect(url_for('index'))
 
 
 # Edit Artist and Venue.
@@ -416,6 +433,7 @@ def edit_venue(venue_id):
 
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
+
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
     venue = Venue.query.get(venue_id)
@@ -440,7 +458,6 @@ def edit_venue_submission(venue_id):
 
 #  Shows
 #  ----------------------------------------------------------------
-
 @app.route('/shows')
 def shows():
   # displays list of shows at /shows
