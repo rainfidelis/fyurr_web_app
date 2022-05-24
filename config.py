@@ -9,7 +9,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 DEBUG = True
 
 # TODO IMPLEMENT DATABASE URL
-SQLALCHEMY_DATABASE_URI = config('DATABASE')
+SQLALCHEMY_DATABASE_URI = config('DATABASE_URL')
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # Keep CSRF token till end of current session
