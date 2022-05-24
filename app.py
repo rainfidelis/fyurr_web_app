@@ -2,19 +2,19 @@
 # Imports
 #----------------------------------------------------------------------------#
 
+from email import message
 import dateutil.parser
 from datetime import datetime
 import babel
 from flask import (
-      Flask, jsonify,
-      render_template, request,
-      Response, flash, redirect,
+      Flask, render_template, 
+      request, flash, redirect,
       url_for)
 from flask_moment import Moment
 import logging
 from logging import Formatter, FileHandler
 from flask_migrate import Migrate
-from flask_wtf import Form, CSRFProtect
+from flask_wtf import CSRFProtect
 from forms import *
 from models import *
 
@@ -220,7 +220,9 @@ def create_venue_submission():
         flash('Venue ' + request.form['name'] + ' was successfully listed!')
         return redirect(url_for('show_venue', venue_id=new_venue.id))
     else:
-        flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed. Please ensure all data formats are correctly followed.')
+        flash('An error occurred.')
+        for field, message in form.errors.items():
+            flash(field + ' - ' + str(message))
         return redirect(url_for('index'))
 
 
@@ -367,8 +369,11 @@ def create_artist_submission():
         flash('Artist ' + request.form['name'] + ' was successfully listed!')
         return redirect(url_for('show_artist', artist_id=artist.id))
     else:
-        flash('An error occurred. Artist ' + request.form['name'] + ' could not be listed. Please ensure all data formats are correctly followed.')
+        flash('An error occurred.')
+        for field, message in form.errors.items():
+            flash(field + ' - ' + str(message))
         return redirect(url_for('index'))
+
 
 @app.route('/artists/<artist_id>/delete', methods=['POST', 'GET', 'DELETE'])
 def delete_artist(artist_id):
@@ -410,8 +415,9 @@ def edit_artist(artist_id):
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
     artist = Artist.query.get(artist_id)
+    form = ArtistForm()
 
-    try:
+    if form.validate_on_submit():
         artist.name = request.form['name']
         artist.city = request.form['city']
         artist.state = request.form['state']
@@ -426,12 +432,11 @@ def edit_artist_submission(artist_id):
         db.session.add(artist)
         db.session.commit()
         flash("Artist " + artist.name + "was successfully updated!")
-    except:
-        db.session.rollback()
-        flash("Error updating " + artist.name + "!")
-    finally:
-        db.session.close()
-        return redirect(url_for('show_artist', artist_id=artist_id))
+    else:
+        flash('An error occurred.')
+        for field, message in form.errors.items():
+            flash(field + ' - ' + str(message))
+    return redirect(url_for('show_artist', artist_id=artist_id))
 
 
 @app.route('/venues/<int:venue_id>/edit', methods=['GET'])
@@ -458,9 +463,9 @@ def edit_venue(venue_id):
 @app.route('/venues/<int:venue_id>/edit', methods=['POST'])
 def edit_venue_submission(venue_id):
     venue = Venue.query.get(venue_id)
-    print(request.form['genres'])
+    form = VenueForm()
 
-    try:
+    if form.validate_on_submit():
         venue.name = request.form['name']
         venue.genres = request.form['genres'].split(',')
         venue.address = request.form['address']
@@ -476,12 +481,11 @@ def edit_venue_submission(venue_id):
         db.session.add(venue)
         db.session.commit()
         flash("Venue " + venue.name + "was successfully updated!")
-    except:
-        db.session.rollback()
-        flash("Error updating " + venue.name + "!")
-    finally:
-        db.session.close()
-        return redirect(url_for('show_venue', venue_id=venue_id))
+    else:
+        flash('An error occurred.')
+        for field, message in form.errors.items():
+            flash(field + ' - ' + str(message))
+    return redirect(url_for('show_venue', venue_id=venue_id))
 
 
 #  Shows
@@ -513,7 +517,8 @@ def create_shows():
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
-    try:
+    form = ShowForm()
+    if form.validate_on_submit():
         artist_id = request.form['artist_id']
         venue_id = request.form['venue_id']
         start_time = request.form['start_time']
@@ -523,12 +528,11 @@ def create_show_submission():
         db.session.add(new_show)
         db.session.commit()
         flash('Show was successfully listed!')
-    except:
-        db.session.rollback()
+    else:
         flash('An error occurred. Show could not be listed.')
-    finally:
-        db.session.close()
-        return redirect(url_for('shows'))
+        for field, message in form.errors.items():
+            flash(field + ' - ' + str(message))
+    return redirect(url_for('shows'))
 
 
 #  Error Handling
