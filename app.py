@@ -8,13 +8,12 @@ from datetime import datetime
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
-from flask_sqlalchemy import SQLAlchemy
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
+from flask_migrate import Migrate
+from flask_wtf import Form, CSRFProtect
 from forms import *
 from models import *
-from flask_migrate import Migrate
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -27,6 +26,8 @@ db.app = app
 db.init_app(app)
 Migrate(app, db)
 
+csrf = CSRFProtect(app)
+csrf.init_app(app)
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
